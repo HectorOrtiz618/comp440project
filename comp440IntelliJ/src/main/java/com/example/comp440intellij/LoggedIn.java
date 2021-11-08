@@ -17,6 +17,8 @@ public class LoggedIn implements Initializable
 {
     @FXML
     private Button resetButton;
+    @FXML
+    private Button logOutButton;
     
     @Override
     public void initialize(URL location, ResourceBundle resource)
@@ -27,7 +29,14 @@ public class LoggedIn implements Initializable
             public void handle(ActionEvent e)
             {
                 DBManager.ClearDB(e);
-                DBManager.changeWindow(e,"SignIn.FXML","Log In!",null,null);
+            }
+        });
+        logOutButton.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent e)
+            {
+                DBManager.changeWindow(e,"SignInBackup.fxml","Log In!",null,null);
             }
         });
     }

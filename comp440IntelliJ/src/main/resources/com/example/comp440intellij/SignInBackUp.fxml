@@ -19,5 +19,6 @@
       </Text>
       <Button fx:id="logInButton" layoutX="226.0" layoutY="248.0" mnemonicParsing="false" text="Log In" />
       <Button fx:id="signUpButton" layoutX="335.0" layoutY="248.0" mnemonicParsing="false" text="Sign Up" />
+      <Button fx:id="initDBButton" layoutX="483.0" layoutY="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="103.0" text="Initialize DB" />
    </children>
 </AnchorPane>

@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
@@ -32,6 +33,8 @@ public class SignIn implements Initializable
     
     @FXML
     private Button signUpButton;
+    @FXML
+    private Button initDBButton;
     
     @Override
     public void initialize(URL location, ResourceBundle resource)
@@ -41,7 +44,14 @@ public class SignIn implements Initializable
            @Override
            public void handle(ActionEvent e)
            {
-               DBManager.logIn(e, userBox.getText(), passwordBox.getText());
+               if(userBox.getText().trim().isEmpty()|| passwordBox.getText().trim().isEmpty())//fields are empty, we cant continue
+               {
+                   Alert alert = new Alert(Alert.AlertType.ERROR);
+                   alert.setContentText("Please fill out all fields and try again");
+                   alert.show();
+               }
+               else
+                DBManager.logIn(e, userBox.getText(), passwordBox.getText());
            }
        });
        signUpButton.setOnAction(new EventHandler<ActionEvent>()
@@ -50,6 +60,15 @@ public class SignIn implements Initializable
             public void handle(ActionEvent e)
             {
                 DBManager.changeWindow(e,"newUser.fxml","Sign Up!",null,null);
+            }
+        }
+        );
+        initDBButton.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent e)
+            {
+                DBManager.ClearDB(e);
             }
         });
     }

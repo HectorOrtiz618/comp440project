@@ -48,16 +48,24 @@ public class SignUp implements Initializable
            @Override
            public void handle(ActionEvent e)
             {
-                String pw = passwordBox.getText();
-                String cpw = confirmPasswordBox.getText();
-                if(!pw.equals(cpw))
+
+                if(userBox.getText().trim().isEmpty() || passwordBox.getText().trim().isEmpty()|| confirmPasswordBox.getText().trim().isEmpty()|| firstNameBox.getText().trim().isEmpty()|| lastNameBox.getText().trim().isEmpty()|| emailBox.getText().trim().isEmpty())//fields are empty, we can't continue
                 {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setContentText("Passwords do not match");
+                    alert.setContentText("Please fill out all fields and try again");
                     alert.show();
                 }
-                else
-                    DBManager.signUpDB(e,userBox.getText(),passwordBox.getText(),firstNameBox.getText(),lastNameBox.getText(),emailBox.getText());
+                else //fields are filled up, now check if passwords match, we don't need db functions to verify this
+                {
+                    String pw = passwordBox.getText();
+                    String cpw = confirmPasswordBox.getText();
+                    if (!pw.equals(cpw)) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setContentText("Passwords do not match");
+                        alert.show();
+                    } else
+                        DBManager.signUpDB(e, userBox.getText(), passwordBox.getText(), firstNameBox.getText(), lastNameBox.getText(), emailBox.getText());
+                }
             }
         });
     }
