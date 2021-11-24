@@ -9,17 +9,17 @@
 
 <AnchorPane id="emailBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.comp440intellij.SignUp">
    <children>
-      <TextField fx:id="userBox" layoutX="226.0" layoutY="97.0" promptText="Enter Username" />
       <Text layoutX="183.0" layoutY="64.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Please Enter your Information">
          <font>
             <Font size="18.0" />
          </font>
       </Text>
+      <TextField fx:id="userBox" layoutX="226.0" layoutY="97.0" promptText="Enter Username" />
       <PasswordField fx:id="passwordBox" layoutX="226.0" layoutY="134.0" promptText="Enter Password" />
       <PasswordField fx:id="confirmPasswordBox" layoutX="226.0" layoutY="175.0" promptText="Confirm Password" />
       <TextField fx:id="firstNameBox" layoutX="226.0" layoutY="210.0" promptText="First Name" />
       <TextField fx:id="lastNameBox" layoutX="226.0" layoutY="247.0" promptText="Last Name" />
-      <Button fx:id="continueButton" layoutX="268.0" layoutY="349.0" mnemonicParsing="false" text="Continue" />
       <TextField fx:id="emailBox" layoutX="226.0" layoutY="285.0" promptText="Email" />
+      <Button fx:id="continueButton" layoutX="268.0" layoutY="349.0" mnemonicParsing="false" text="Continue" />
    </children>
 </AnchorPane>

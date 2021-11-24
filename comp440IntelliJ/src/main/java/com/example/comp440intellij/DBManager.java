@@ -15,10 +15,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.*;
 
-/**
- *
- * @author MonkeyBoy
- */
 public class DBManager {
 
     public static void changeWindow(ActionEvent event, String fxmlFile, String title, String username, String password) {
@@ -43,6 +39,10 @@ public class DBManager {
         stage.setTitle(title);
         stage.setScene(new Scene(root,600,400));
         stage.show();
+    }
+    public static void changeToBlogWindow(ActionEvent event, String fxmlFile, String title, String username, String password, String ID)
+    {
+
     }
 
     public static void signUpDB(ActionEvent e, String username, String password, String firstName, String lastName, String Email) {
@@ -230,6 +230,28 @@ public class DBManager {
             }
         }
     }
+    public static void getBLogList()//GetList of Comments and Insert into TableView
+    {
+        //Get Date, Name, Blog Title and ID and push into TableView
+    }
+    public static void insertBlog(String username, String blogTitle, String description, String tags)
+    {
+        //we can gererate date with SELECT CAST( GETDATE() AS Date ); which will generate the Date as YYYY-MM-DD
+        //No more than 2 Blogs a day, we can check this by counting the blogs made by suer and todays date
+        //We can split the blogs using the string split function https://www.geeksforgeeks.org/split-string-java-examples/ we can store the slplit string withan array of strings
+        // We will then push the tags with the same blogID until we go through the array fo strings
+
+    }
+    public static void getComments()//Get the list of comments and insert into TableView
+    {
+        //Get Date, Name, Sentiment, and Comment and push into the tableview on BlogView
+    }
+    public static void insertComment(String username, String blogAuthor, String reception, String comment, String blogId)//Insert comment into DataBase
+    {
+        //we can genrerate date with SELECT CAST( GETDATE() AS Date ); which will generate the Date as YYYY-MM-DD
+        //Check if the commenting user isn't the blogAuthor, throw alert if they're the same
+        //No more than 3 comments a day, we can check by counting the amount of comments containing the same username and today's date
+    }
     public static void ClearDB(ActionEvent e)
     {
         Connection connection = null;
@@ -245,7 +267,8 @@ public class DBManager {
             psInsertTable.executeUpdate();
             psInsertComp440User = connection.prepareStatement("INSERT INTO users (username, password, firstname, lastname, email) VALUES ('Comp440', 'pass1234', 'John','Doe', 'JohnD@email.com')");
             psInsertComp440User.executeUpdate();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setContentText("Database has been reset! Returning to Login Screen!");
             alert.show();
 

@@ -11,10 +11,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
 
 public class LoggedIn implements Initializable
 {
+
     @FXML
     private Button resetButton;
     @FXML

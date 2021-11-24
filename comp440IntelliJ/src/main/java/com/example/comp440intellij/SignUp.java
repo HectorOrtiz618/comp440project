@@ -14,10 +14,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
 
-/**
- *
- * @author MonkeyBoy
- */
 public class SignUp implements Initializable
 {
     @FXML
