@@ -44,11 +44,11 @@ public class blogView implements Initializable
     private TextField backButton;
 
 
-    public void getBlogData(String Title, String Date, String Description, String Tags)//results from DBmanager gets inserted into blog
+    public static void getBlogData(String Title, String Date, String Description, String Tags)//results from DBmanager gets inserted into blog
     {
 
     }
-    public void getBlogComments()// results from DB manager gets inserted into comments
+    public static void getBlogComments(String date,String user,String sentiment)// results from DB manager gets inserted into comments
     {
 
     }

@@ -64,7 +64,7 @@ public class SignIn implements Initializable
             @Override
             public void handle(ActionEvent e)
             {
-                DBManager.ClearDB(e);
+                /*DBManager.ClearDB(e);*/
             }
         });
     }

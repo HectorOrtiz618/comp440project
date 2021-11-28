@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.sql.*;
 
 public class DBManager {
+    private String loggedInUser;
+    private void  setLoggedInUser(String user){ loggedInUser = user;};
 
     public static void changeWindow(ActionEvent event, String fxmlFile, String title, String username, String password) {
         Parent root = null;
@@ -158,7 +160,8 @@ public class DBManager {
         }
     }
 
-    public static void logIn(ActionEvent e, String username, String password) {
+    public static void logIn(ActionEvent e, String username, String password)
+    {
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -233,6 +236,102 @@ public class DBManager {
     public static void getBLogList()//GetList of Comments and Insert into TableView
     {
         //Get Date, Name, Blog Title and ID and push into TableView
+        Connection connection = null;
+        PreparedStatement psGetBlogs = null;
+        ResultSet resultsBlogs = null;
+        //If result set is empty, don't push anything and leave the table blank.
+        try
+        {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/comp440", "root", "comp440");
+            psGetBlogs = connection.prepareStatement("Select * FROM blogs ORDER BY date");// if we wanted by earliest date, we use ORDER BY date ASC instead
+            resultsBlogs = psGetBlogs.executeQuery();
+
+            while(resultsBlogs.next())
+            {
+                //Push in the contents into blogLists
+            }
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+
+    }
+    public static void getBlogContent(String blogid)
+    {
+        //Get Title, author, subject, date, tags and push to blogView
+        Connection connection = null;
+        PreparedStatement psGetBlog = null;
+        ResultSet resultsBlogContent = null;
+
+        PreparedStatement psGetTags = null;
+        ResultSet resultTags = null;
+
+        try
+        {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/comp440", "root", "comp440");
+            psGetBlog = connection.prepareStatement("SELECT blogtitle, description, author, date from blogs WHERE blogid = ?");
+            psGetBlog.setString(1, blogid);
+            resultsBlogContent = psGetBlog.executeQuery();
+            psGetTags = connection.prepareStatement("Select tags from tags where blogid = ?");
+            psGetTags.setString(1,blogid);
+            resultTags = psGetTags.executeQuery();
+
+            //push contents into blogVIew
+            String title =resultsBlogContent.getString("blogtitle");
+            String date = resultsBlogContent.getString("cdate");
+            String desc = resultsBlogContent.getString("description");
+            String tags = resultTags.getString("tags");
+            blogView.getBlogData(title,date,desc,tags);
+
+            if(resultsBlogContent != null)//close results, preparedStatements, and connections to prevent memory leaks
+            {
+                try
+                {
+                    resultsBlogContent.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(resultTags != null)
+            {
+                try
+                {
+                    resultTags.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(psGetBlog != null)//close results, preparedStatements, and connections to prevent memory leaks
+            {
+                try
+                {
+                    psGetBlog.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(connection != null)//close results, preparedStatements, and connections to prevent memory leaks
+            {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
     }
     public static void insertBlog(String username, String blogTitle, String description, String tags)
     {
@@ -240,17 +339,91 @@ public class DBManager {
         //No more than 2 Blogs a day, we can check this by counting the blogs made by suer and todays date
         //We can split the blogs using the string split function https://www.geeksforgeeks.org/split-string-java-examples/ we can store the slplit string withan array of strings
         // We will then push the tags with the same blogID until we go through the array fo strings
+        Connection connection = null;
+        PreparedStatement psInsertBlog = null;
+        PreparedStatement psIsOverDailyLimit = null;
+        ResultSet resultsBlogsInserted = null;
+
+        PreparedStatement psGetDate = null;
+        ResultSet rsDate = null;
+
+        PreparedStatement psIsInsertTags = null;
 
     }
-    public static void getComments()//Get the list of comments and insert into TableView
+    public static void getComments(String blogID)//Get the list of comments and insert into TableView
     {
         //Get Date, Name, Sentiment, and Comment and push into the tableview on BlogView
+        Connection connection = null;
+        PreparedStatement psGetComments = null;
+        ResultSet resultComments = null;
+        //If result set is empty, leave the table blank
+        try
+        {
+            connection = connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/comp440", "root", "comp440");
+            psGetComments = connection.prepareStatement("SELECT (date,username,sentiment) FROM comments WHERE blogid = ?");
+            psGetComments.setString(1, blogID);
+            resultComments = psGetComments.executeQuery();
+
+            while(resultComments.next())//Push results to blogViewController
+            {
+                String date = resultComments.getString("date");
+                String commentUser =resultComments.getString("username");
+                String sentiment = resultComments.getString("sentiment");
+
+                blogView.getBlogComments(date,commentUser,sentiment);
+            }
+            if(resultComments != null)//close results, preparedStatements, and connections to prevent memory leaks
+            {
+                try
+                {
+                    resultComments.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(psGetComments != null)//close results, preparedStatements, and connections to prevent memory leaks
+            {
+                try
+                {
+                    psGetComments.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(connection != null)//close results, preparedStatements, and connections to prevent memory leaks
+            {
+                try
+                {
+                    connection.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
     }
     public static void insertComment(String username, String blogAuthor, String reception, String comment, String blogId)//Insert comment into DataBase
     {
         //we can genrerate date with SELECT CAST( GETDATE() AS Date ); which will generate the Date as YYYY-MM-DD
         //Check if the commenting user isn't the blogAuthor, throw alert if they're the same
         //No more than 3 comments a day, we can check by counting the amount of comments containing the same username and today's date
+
+        Connection connection = null;
+        PreparedStatement psInsertBlog = null;
+        PreparedStatement psIsOverDailyLimit = null;
+        ResultSet resultsBlogsInserted = null;
+
+        PreparedStatement psGetDate = null;
+        ResultSet rsDate = null;
     }
     public static void ClearDB(ActionEvent e)
     {
