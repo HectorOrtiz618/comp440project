@@ -55,7 +55,7 @@ public class SignIn implements Initializable
             @Override
             public void handle(ActionEvent e)
             {
-                DBManager.changeWindow(e,"newUser.fxml","Sign Up!",null,null);
+                DBManager.changeWindow(e,"newUser.fxml","Sign Up!");
             }
         }
         );

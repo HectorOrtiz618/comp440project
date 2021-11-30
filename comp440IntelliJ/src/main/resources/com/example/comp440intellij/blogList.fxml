@@ -5,18 +5,18 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane fx:id="blogTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="Window" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.comp440intellij.blogLists">
    <children>
-      <TableView layoutX="62.0" layoutY="68.0" prefHeight="257.0" prefWidth="481.0">
+      <TableView fx:id="blogTable" layoutX="62.0" layoutY="68.0" prefHeight="257.0" prefWidth="481.0">
         <columns>
-          <TableColumn fx:id="blogDate" prefWidth="84.0" text="Date" />
-          <TableColumn fx:id="blogTitle" prefWidth="195.0" text="Subject" />
-            <TableColumn fx:id="createdBy" prefWidth="164.0" text="Author" />
-            <TableColumn fx:id="blogId" prefWidth="37.0" text="ID" />
+          <TableColumn fx:id="blogDate" editable="false" prefWidth="84.0" text="Date" />
+          <TableColumn fx:id="blogTitle" editable="false" prefWidth="195.0" text="Subject" />
+            <TableColumn fx:id="createdBy" editable="false" prefWidth="164.0" text="Author" />
+            <TableColumn fx:id="blogId" editable="false" prefWidth="37.0" text="ID" />
         </columns>
       </TableView>
-      <Button layoutX="68.0" layoutY="341.0" mnemonicParsing="false" text="Log Out" />
-      <Button layoutX="475.0" layoutY="341.0" mnemonicParsing="false" text="New Blog" />
+      <Button fx:id="logOutButton" layoutX="68.0" layoutY="341.0" mnemonicParsing="false" text="Log Out" />
+      <Button fx:id="newBlogButton" layoutX="475.0" layoutY="341.0" mnemonicParsing="false" text="New Blog" />
+      <Button fx:id="viewButton" layoutX="475.0" layoutY="35.0" mnemonicParsing="false" text="View Blog" />
    </children>
 </AnchorPane>

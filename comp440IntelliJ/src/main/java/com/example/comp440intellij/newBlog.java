@@ -34,16 +34,28 @@ public class newBlog implements Initializable
     public void initialize(URL location, ResourceBundle resource) {
         submitButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
-            public void handle(ActionEvent e) {
-                DBManager.insertBlog(username,blogTitle.getText(),blogDesc.getText(),blogTags.getText());//TODO: error handling, cant push null values into DB
+            public void handle(ActionEvent e)
+            {
+                if(!blogTitle.getText().trim().isEmpty() && !blogDesc.getText().trim().isEmpty() && !blogTags.getText().trim().isEmpty()) {
+                    DBManager.insertBlog(blogTitle.getText().trim(), blogDesc.getText().trim(), blogTags.getText().trim());//trim extra spaces
+                    DBManager.changeWindow(e, "blogList.fxml", "Welcome!");
+                }
+                else
+                {
+                    //alert
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setContentText("Make sure that you have entered in every field!");
+                    alert.show();
+                }
             }
         });
         cancelButton.setOnAction(new EventHandler<ActionEvent>()
         {
             //Go Back to blogView
             @Override
-            public void handle(ActionEvent e) {
-                DBManager.changeWindow(e, "blogView.fxml", "Welcome!", username, password);
+            public void handle(ActionEvent e)
+            {
+                DBManager.changeWindow(e, "blogList.fxml", "Welcome!");
             }
         });
     }

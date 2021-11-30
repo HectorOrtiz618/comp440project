@@ -36,7 +36,8 @@ public class LoggedIn implements Initializable
             @Override
             public void handle(ActionEvent e)
             {
-                DBManager.changeWindow(e,"SignInBackup.fxml","Log In!",null,null);
+                DBManager.setLoggedInUser(null);
+                DBManager.changeWindow(e,"SignInBackup.fxml","Log In!");
             }
         });
     }
