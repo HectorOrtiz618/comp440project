@@ -18,7 +18,7 @@ public class newBlog implements Initializable
     private TextField blogTitle;
 
     @FXML
-    private TextField blogDesc;
+    private TextArea blogDesc;
 
     @FXML
     private TextField blogTags;

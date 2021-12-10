@@ -26,10 +26,15 @@ public class blogLists implements Initializable
     private TableColumn<blogRow,String> createdBy;
     @FXML
     private TableColumn<blogRow,String> blogId;
+
     @FXML
     private Button logOutButton;
     @FXML
     private Button viewButton;
+    @FXML
+    private Button searchBlogsButton;
+    @FXML
+    private Button searchUsersButton;
 
     @FXML
     private TableView blogTable;
@@ -85,8 +90,30 @@ public class blogLists implements Initializable
             @Override
             public void handle(ActionEvent actionEvent)
             {
-                DBManager.getBlogContent();
-                DBManager.changeWindow(actionEvent, "blogView.fxml", "Look at this blog!");
+                if(DBManager.getCurrentId() != -1)
+                {
+                    DBManager.getBlogContent();
+                    DBManager.changeWindow(actionEvent, "blogView.fxml", "Look at this blog!");
+                }
+
+            }
+
+        });
+        searchUsersButton.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent actionEvent)
+            {
+                DBManager.changeWindow(actionEvent, "searchUsers.fxml", "Search Users!");
+            }
+
+        });
+        searchBlogsButton.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent actionEvent)
+            {
+                DBManager.changeWindow(actionEvent, "searchBlogs.fxml", "Search Blogs!");
             }
 
         });

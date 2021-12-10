@@ -17,7 +17,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBManager {
+public class DBManager
+{
     private static String loggedInUser = null;
     public static void  setLoggedInUser(String user){ loggedInUser = user;};
     public static String getLoggedInUser() { return loggedInUser;};
@@ -119,7 +120,7 @@ public class DBManager {
                 psInsert.executeUpdate();
 
                 setLoggedInUser(username);
-                changeWindow(e, "resetDB.fxml", "Welcome!");
+                changeWindow(e, "blogList.fxml", "Welcome " + loggedInUser);
 
             }
         } catch (SQLException ex) {
@@ -329,6 +330,164 @@ public class DBManager {
         }
         return blogs;
 
+    }
+    public static List<blogRow> getBlogQuery(int option, String input)
+    {
+        List<blogRow> blogs = new ArrayList<blogRow>();
+        Connection connection = null;
+        PreparedStatement psGetBlogs = null;
+        ResultSet rsGetBlogs = null;
+        try
+        {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/comp440", "root", "comp440");
+            switch(option)
+            {
+                case 1: // Search blogs that only have positive comments
+                    psGetBlogs = connection.prepareStatement("SELECT pdate, subject, created_by,blogid FROM blogs WHERE (SELECT count(commentid) FROM comments where blogid = blogs.blogid) > 0 AND (SELECT count(blogid) FROM comments WHERE sentiment = 'negative' AND blogid = blogs.blogid)  = 0 AND created_by = ?");
+                    psGetBlogs.setString(1,input);
+                    break;
+                default:
+                    psGetBlogs = connection.prepareStatement("SELECT pdate, subject, created_by, blogid FROM Blogs");//give all blogs if nothing else applies
+                    break;
+            }
+            rsGetBlogs = psGetBlogs.executeQuery();
+            while(rsGetBlogs.next())
+            {
+                //add blogs to row
+                blogs.add(new blogRow(rsGetBlogs.getString("pdate"),rsGetBlogs.getString("subject"),rsGetBlogs.getString("created_by"),rsGetBlogs.getString("blogid")));
+            }
+            if (blogs.isEmpty())//if no results are found, return a "blog" that says no results found
+            {
+                blogs.add(new blogRow("No Results Found","","",""));
+            }
+
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if(rsGetBlogs != null)
+            {
+                try
+                {
+                    rsGetBlogs.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(psGetBlogs != null)
+            {
+                try
+                {
+                    psGetBlogs.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(connection != null)
+            {
+                try
+                {
+                    connection.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return blogs;
+    }
+    public static List<userRow> getUserQuery(int option,String follower1, String follower2)
+    {
+        List<userRow> users = new ArrayList<userRow>();
+        Connection connection = null;
+        PreparedStatement psGetUsers = null;
+        ResultSet rsGetUsers = null;
+        try
+        {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/comp440", "root", "comp440");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/comp440", "root", "comp440");
+            switch(option)
+            {
+                case 1:// List who posted the most blogs today
+                    psGetUsers = connection.prepareStatement("SELECT created_by, COUNT(*) AS numOfBlogs FROM blogs WHERE pdate= DATE(NOW()) GROUP BY created_by ORDER BY numOfBlogs DESC");
+                    break;
+                case 2:// List those followed by x and y
+                    psGetUsers = connection.prepareStatement("SELECT Leader, followerOne, followerTwo FROM (  SELECT A.leadername as Leader, A.followername as followerOne, B.followername as followerTwo  FROM follows A, follows B WHERE A.leadername = B.leadername AND A.followername <> B.followername) AS main  WHERE followerOne =? AND followerTwo = ?");
+                    psGetUsers.setString(1,follower1);
+                    psGetUsers.setString(2,follower2);
+                    break;
+                case 3://List users who never posted a blog
+                    psGetUsers = connection.prepareStatement("SELECT username FROM users WHERE(SELECT count(created_by) FROM blogs WHERE created_by = username ) = 0");
+                    break;
+                case 4://List users who only posted negative comments
+                    psGetUsers = connection.prepareStatement("SELECT username FROM users WHERE (SELECT count(posted_by) FROM comments WHERE sentiment = 'positive' AND posted_by = username) = 0 AND (SELECT count(posted_by) FROM comments WHERE posted_by = username) > 0");
+                    break;
+                case 5://List users who never got a negative comment
+                    psGetUsers = connection.prepareStatement("SELECT username from users WHERE (SELECT COUNT(created_by) from blogs,comments WHERE blogs.blogid = comments.blogid AND comments.sentiment = \"negative\" and created_by = username) = 0 AND (SELECT COUNT(*) FROM blogs,comments WHERE blogs.blogid = comments.blogid AND blogs.created_by = username) > 0");
+                    break;
+                default:
+                    psGetUsers = connection.prepareStatement("SELECT username FROM users");// return all users if nothing else applies
+                    break;
+            }
+            rsGetUsers = psGetUsers.executeQuery();
+            while(rsGetUsers.next())// add results to user list
+            {
+                users.add(new userRow(rsGetUsers.getString(1)));
+            }
+            if (users.isEmpty())//if no results are found, return a "user" that says no results found
+            {
+                users.add(new userRow("No Results Found"));
+            }
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if(rsGetUsers != null)
+            {
+                try
+                {
+                    rsGetUsers.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(psGetUsers != null)
+            {
+                try
+                {
+                    psGetUsers.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if(connection != null)
+            {
+                try
+                {
+                    connection.close();
+                }
+                catch(SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return users;
     }
     public static void getBlogContent()
     {
@@ -834,34 +993,61 @@ public class DBManager {
     public static void ClearDB(ActionEvent e)
     {
         Connection connection = null;
-        PreparedStatement psClearTable = null;
         PreparedStatement psInsertTable = null;
-        PreparedStatement psInsertComp440User = null;
         try
         {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/comp440", "root", "comp440");
-            psClearTable = connection.prepareStatement("DROP TABLE IF EXISTS users");
-            psClearTable.executeUpdate();
-            psInsertTable = connection.prepareStatement("CREATE TABLE `users` (`username` varchar(50) NOT NULL,`password` varchar(255) NOT NULL,`firstname` varchar(50) NOT NULL,`lastname` varchar(50) NOT NULL,`email` varchar(50) NOT NULL, PRIMARY KEY (`username`), UNIQUE KEY `email` (`email`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+
+            psInsertTable = connection.prepareStatement("DROP TABLE IF EXISTS `hobbies`;");
             psInsertTable.executeUpdate();
-            psInsertComp440User = connection.prepareStatement("INSERT INTO users (username, password, firstname, lastname, email) VALUES ('Comp440', 'pass1234', 'John','Doe', 'JohnD@email.com')");
-            psInsertComp440User.executeUpdate();
+            psInsertTable = connection.prepareStatement("DROP TABLE IF EXISTS `follows`;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("DROP TABLE IF EXISTS `comments`;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("DROP TABLE IF EXISTS `blogstags`;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("DROP TABLE IF EXISTS `blogs`;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("DROP TABLE IF EXISTS users");
+            psInsertTable.executeUpdate();
+
+            psInsertTable = connection.prepareStatement("CREATE TABLE `users` (`username` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,`password` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,`firstName` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,`lastName` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,`email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,PRIMARY KEY (`username`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("INSERT INTO `users` VALUES ('batman','1234','bat','bat','nananana@batman.com'),('bob','12345','bob','bob','bobthatsme@yahoo.com'),('catlover','abcd','cat','cat','catlover@whiskers.com'),('doglover','efds','dog','dog','doglover@bark.net'),('jdoe','25478','joe','jod','jane@doe.com'),('jsmith','1111','john','smith','jsmith@gmail.com'),('matty','2222','mat','mat','matty@csun.edu'),('notbob','5555','not','bob','stopcallingmebob@yahoo.com'),('pacman','9999','pacman','pacman','pacman@gmail.com'),('scooby','8888','scoby','scoby','scooby@doo.net');");
+            psInsertTable.executeUpdate();
+
+            psInsertTable = connection.prepareStatement("CREATE TABLE `blogs` (`blogid` int(10) unsigned NOT NULL AUTO_INCREMENT,`subject` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,`description` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,`pdate` date DEFAULT NULL,`created_by` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,PRIMARY KEY (`blogid`),KEY `FK1_idx` (`description`),KEY `FK1` (`created_by`),CONSTRAINT `FK1` FOREIGN KEY (`created_by`) REFERENCES `users` (`username`)) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("INSERT INTO `blogs` VALUES (1,'Hello World','Hey everyone, this is my first blog. Hello world and all who inhabit it!','2020-03-15','jsmith'),(2,'I love cats!','Cats are amazing. They\\'re awesome, and fuzzy, and cute. Who DOESN\\'T love cats?','2020-03-17','catlover'),(3,'Dogs are the best.','So I saw a post the other day talking about cats. Now, I love cats. They\\'re great. But here\\'s the thing: dogs are just the best, okay? There\\'s no question about it. That is all.','2020-03-19','doglover'),(4,'I am the night.','To all you lowly criminals out there, this is a warning to know I am watching. I am justice. I am righteousness. I am the NIGHT.','2020-03-24','batman'),(5,'Waka waka','waka waka waka waka waka waka waka waka waka waka waka waka waka waka waka waka','2020-03-31','pacman'),(6,'Who is this Bob guy?','Decided to start tracking down this mysterious human known as \\'Bob.\\' Who is Bob? What does he do? WHY does he do it? There is a lot of mystery surrounding this person, and I will be going into detail in future posts. Stay tuned!','2020-04-02','notbob'),(7,'Re: I love cats.','A reader recently reached out to me about my last post. To be clear, I\\'m not dissing our canine companions! But we\\'ve got to be honest here, why are cats better? They\\'re smart, affectionate, and great cuddle partners. Cats are better. It\\'s just fact.','2020-04-04','catlover'),(8,'Scooby Dooby Doo!','The search for scooby snacks: Where did they go? I know this whole quarantine thing is affecting businesses, but aren\\'t scooby snacks counted as an essential service? Please post below if you find anything! I\\'m going crazy here!','2020-04-05','scooby'),(9,'Bob Update','Dear readers, I know you have been waiting anxiously for an update on Bob, but there is not much to share so far. He appears to have little to no online presence. Just a clarification: I am decidedly NOT Bob. Thanks all. Stay tuned for more!','2020-04-06','notbob'),(10,'Lizard People.','What are your guys\\' thoughts on them? I, for one, welcome out reptitlian overlords.','2020-04-12','jdoe');");
+            psInsertTable.executeUpdate();
+
+            psInsertTable = connection.prepareStatement("CREATE TABLE `blogstags` (`blogid` int(10) unsigned NOT NULL,`tag` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,PRIMARY KEY (`blogid`,`tag`),CONSTRAINT `blogstags_ibfk_1` FOREIGN KEY (`blogid`) REFERENCES `blogs` (`blogid`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("INSERT INTO `blogstags` VALUES (1,'hello world'),(2,'animals'),(2,'cats'),(3,'animals'),(3,'dogs'),(4,'crime'),(4,'justice'),(5,'cartoon'),(5,'waka'),(6,'bob'),(6,'update'),(7,'cats'),(7,'dogs'),(8,'dogs'),(8,'quarantine'),(8,'scooby snacks'),(9,'bob'),(9,'update'),(10,'lizards');");
+            psInsertTable.executeUpdate();
+
+            psInsertTable = connection.prepareStatement("CREATE TABLE `comments` (`commentid` int(10) NOT NULL AUTO_INCREMENT,`sentiment` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,`description` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,`cdate` date DEFAULT NULL,`blogid` int(10) unsigned DEFAULT NULL,`posted_by` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,PRIMARY KEY (`commentid`),KEY `comments_ibfk_1` (`blogid`),KEY `comments_ibfk_2` (`posted_by`),CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`blogid`) REFERENCES `blogs` (`blogid`),CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`posted_by`) REFERENCES `users` (`username`),CONSTRAINT `sentiment_types` CHECK ((`sentiment` in (_utf8mb4'negative',_utf8mb4'positive')))) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("INSERT INTO `comments` VALUES (1,'negative','Cats are cool and all, but dogs are where it\\'s at.','2020-03-17',2,'doglover'),(2,'negative','What\\'s all the hype about? Cats are clearly superior.','2020-03-20',3,'catlover'),(3,'positive','Nice.','2020-03-20',4,'scooby'),(4,'positive','Who IS Bob? I can\\'t wait to find out.','2020-04-02',6,'jsmith'),(5,'negative','I guess cat people just don\\'t know what they\\'re missing.','2020-04-05',7,'doglover'),(6,'positive','This is totally unrelated, but I just wanted to say I am a HUGE fan of yours. I love your work!','2020-04-05',8,'doglover'),(7,'positive','Have you checked out Dog-Mart? They\\'ve got everything.','2020-04-06',8,'matty'),(8,'negative','I was hoping there\\'d be more of an update. Sorry, Bob.','2020-04-07',9,'jsmith'),(9,'positive','I think they\\'re all secretly cats. Open your eyes, sheeple!','2020-04-13',10,'doglover'),(10,'negative','Who? Me? Multimillionaire philanthropist of Arkham? A lizard person? Nope. Nothing to see here!','2020-04-15',10,'batman');");
+            psInsertTable.executeUpdate();
+
+            psInsertTable = connection.prepareStatement("CREATE TABLE `follows` (`leadername` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,`followername` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,PRIMARY KEY (`leadername`,`followername`),KEY `follows_ibfk_2` (`followername`),CONSTRAINT `follows_ibfk_1` FOREIGN KEY (`leadername`) REFERENCES `users` (`username`),CONSTRAINT `follows_ibfk_2` FOREIGN KEY (`followername`) REFERENCES `users` (`username`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("INSERT INTO `follows` VALUES ('jsmith','bob'),('batman','catlover'),('doglover','catlover'),('pacman','catlover'),('catlover','doglover'),('jsmith','jdoe'),('bob','notbob'),('jdoe','notbob'),('batman','pacman'),('scooby','pacman'),('doglover','scooby'),('pacman','scooby');");
+            psInsertTable.executeUpdate();
+
+            psInsertTable = connection.prepareStatement("CREATE TABLE `hobbies` (`username` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,`hobby` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,PRIMARY KEY (`hobby`,`username`),KEY `hobbies_ibfk_1` (`username`),CONSTRAINT `hobbies_ibfk_1` FOREIGN KEY (`username`) REFERENCES `users` (`username`),CONSTRAINT `hobby_types` CHECK ((`hobby` in (_utf8mb4'hiking',_utf8mb4'swimming',_utf8mb4'calligraphy',_utf8mb4'bowling',_utf8mb4'movie',_utf8mb4'cooking',_utf8mb4'dancing')))) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+            psInsertTable.executeUpdate();
+            psInsertTable = connection.prepareStatement("INSERT INTO `hobbies` VALUES ('batman','movie'),('bob','movie'),('catlover','movie'),('doglover','hiking'),('jdoe','dancing'),('jdoe','movie'),('jsmith','hiking'),('matty','bowling'),('notbob','calligraphy'),('pacman','dancing'),('pacman','movie'),('scooby','cooking');");
+            psInsertTable.executeUpdate();
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setContentText("Database has been reset! Returning to Login Screen!");
             alert.show();
 
-            if(psClearTable != null)
-            {
-                psClearTable.close();
-            }
             if(psInsertTable != null)
             {
                 psInsertTable.close();
-            }
-            if(psInsertComp440User != null)
-            {
-                psInsertComp440User.close();
             }
             if(connection != null)
             {

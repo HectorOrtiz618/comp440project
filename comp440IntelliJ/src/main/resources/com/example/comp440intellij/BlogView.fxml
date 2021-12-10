@@ -11,7 +11,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.comp440intellij.blogView">
    <children>
-      <TextArea fx:id="blogDesc" editable="false" layoutX="9.0" layoutY="97.0" prefHeight="219.0" prefWidth="572.0" />
+      <TextArea fx:id="blogDesc" editable="false" layoutX="9.0" layoutY="97.0" prefHeight="219.0" prefWidth="572.0" wrapText="true" />
       <Text fx:id="blogTitle" layoutX="60.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Title" textAlignment="CENTER" wrappingWidth="503.765625">
          <font>
             <Font size="18.0" />
@@ -36,7 +36,7 @@
       </TableView>
       <Text fx:id="blogAuthor" layoutX="20.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="219.13671875" />
       <Text fx:id="blogID" layoutX="301.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ID" />
-      <TextArea fx:id="commentField" layoutX="33.0" layoutY="578.0" prefHeight="165.0" prefWidth="530.0" />
+      <TextArea fx:id="commentField" layoutX="33.0" layoutY="578.0" prefHeight="157.0" prefWidth="530.0" />
       <Text fx:id="blogTags" layoutX="22.0" layoutY="539.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
    </children>
 </AnchorPane>

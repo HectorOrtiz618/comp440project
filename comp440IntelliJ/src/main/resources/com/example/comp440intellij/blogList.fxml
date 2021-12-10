@@ -16,7 +16,9 @@
         </columns>
       </TableView>
       <Button fx:id="logOutButton" layoutX="68.0" layoutY="341.0" mnemonicParsing="false" text="Log Out" />
-      <Button fx:id="newBlogButton" layoutX="475.0" layoutY="341.0" mnemonicParsing="false" text="New Blog" />
-      <Button fx:id="viewButton" layoutX="475.0" layoutY="35.0" mnemonicParsing="false" text="View Blog" />
+      <Button fx:id="newBlogButton" layoutX="475.0" layoutY="43.0" mnemonicParsing="false" text="New Blog" />
+      <Button fx:id="viewButton" layoutX="475.0" layoutY="341.0" mnemonicParsing="false" text="View Blog" />
+      <Button fx:id="searchUsersButton" layoutX="199.0" layoutY="341.0" mnemonicParsing="false" text="Search Users" />
+      <Button fx:id="searchBlogsButton" layoutX="342.0" layoutY="341.0" mnemonicParsing="false" text="Search Blogs" />
    </children>
 </AnchorPane>

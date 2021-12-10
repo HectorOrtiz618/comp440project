@@ -52,13 +52,6 @@ public class blogView implements Initializable
     @FXML
     private Button backButton;
 
-    /*public void getBlogData(String Title, String Author, String Date, String Desc)
-    {
-        blogTitle.setText(Title);
-        blogDate.setText(Date);
-        blogAuthor.setText(Author);
-        blogDesc.setText(Desc);
-    }*/
 
     @Override
     public void initialize(URL location, ResourceBundle resource)
